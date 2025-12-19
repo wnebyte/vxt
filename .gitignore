@@ -1,0 +1,13 @@
+# DIRECTORIES
+.vscode
+.idea
+**/run
+**/lib
+**/testenv
+
+# FILES
+**/bin/*
+!**/bin/*.sh
+*.log
+*.so
+*.o

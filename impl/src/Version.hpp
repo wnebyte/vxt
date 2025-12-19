@@ -1,0 +1,7 @@
+#ifndef VXT_VERSION_HPP
+#define VXT_VERSION_HPP
+
+#define VXT_MAJOR_VERSION 1
+#define VXT_MINOR_VERSION 0
+
+#endif // VXT_VERSION_HPP
