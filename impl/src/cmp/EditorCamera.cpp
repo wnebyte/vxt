@@ -216,11 +216,7 @@ Camera::Direction EditorCamera::keyEventToDirection(const io::KeyEvent *event) c
 
 Camera* EditorCamera::getCamera(void)
 {
-	Camera *camera = NULL;
-
-	UFW_ASSERT((m_scene != NULL) && ("scene is NULL"));
-	camera = m_scene->getCamera();
+	Camera *camera = getScene()->getCamera();
 	UFW_ASSERT((camera != NULL) && ("camera is NULL"));
-
 	return camera;
 }

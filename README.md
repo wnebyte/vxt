@@ -15,10 +15,10 @@
 * ~~Turn GridLines into a component.~~
 * ~~Add Constants.hpp~~
 * ~~Add Camera::getPosition()~~
-* ~~Add Camera add/sub/mul/div functions~~A
+* ~~Add Camera add/sub/mul/div functions~~
 * ~~Upgrade GLFW CONTEXT MAJOR VERSION to 4~~
 * Create module based makefiles
-* ~~A Create Transformation utility class/ns~~A
+* ~~A Create Transformation utility class/ns~~
 * Should BatchRenderer implement Renderer?
 * Add flush function to Renderer interface
 * ~~Implement ELEMENT_BUFFER in Vertex2 Batch Renderer~~
@@ -26,6 +26,15 @@
 * Implement missing std functions
 * Add draw circle function
 * Add move operators for Entity class
+* ~~Cross compile for Windows~~
+* Move builder classes into one file (Builder.hpp)
 
 ### Set location of core dump
+
 sudo sysctl -w kernel.core_pattern=/tmp/core-%e.%p.%h.%t
+
+### Notes to self
+
+-Wl,--subsystem,windows
+
+_POSIX_C_SOURCE >= 200112L

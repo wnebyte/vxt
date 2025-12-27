@@ -34,6 +34,8 @@ public:
 
 	static void drawCube3(const Cube3 &cube);
 
+	static void drawCrossHair(const CrossHair &ch);
+
 	static void add(ecs::Entity &entity);
 
 	static void render(const Camera &camera);

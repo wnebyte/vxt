@@ -26,6 +26,10 @@
 namespace vxt {
 namespace utl
 {
+extern float ZERO_FILLER_VEC[4];
+
+extern float ONE_FILLER_VEC[4];
+
 extern uint32_t BUFS_ZERO_NONE_NONE[3];
 
 extern uint32_t BUFS_NONE_ONE_TWO[3];

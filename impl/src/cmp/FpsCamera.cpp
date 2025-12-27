@@ -33,24 +33,33 @@ void FpsCamera::handle_event(uint event, std::shared_ptr<void> data)
 		{
 			const io::KeyEvent *event = (io::KeyEvent*)data.get();
 
-			if ((event->action == GLFW_PRESS) || (event->action == GLFW_REPEAT)) {
-				const Camera::Direction dir = keyEventToDirection(event);
+			if ( (event->action == GLFW_PRESS) || (event->action == GLFW_REPEAT) ) {
+				const Camera::Direction dir = keyCodeToDirection(event->keyCode);
 
 				if (dir != Camera::UNKNOWN) {
-					updatePosition(dir, Application::dt());
+					adjustPosition(dir, event->mods, Application::dt());
+				} else if (event->keyCode == GLFW_KEY_KP_DECIMAL) {
+					PerspectiveCamera *camera = dynamic_cast<PerspectiveCamera*>( getCamera() );
+					camera->setYaw(VXT_CAMERA_DEFAULT_YAW);
+					camera->setPitch(VXT_CAMERA_DEFAULT_PITCH);
+					std::printf("[%s] yaw=%.2f pitch=%.2f\n",
+						TAG, camera->getYaw(), camera->getPitch());
 				}
 			}
-		}
 			break;
+		}
 		case VXT_EVENT_CURSOR:
 		{
 			const io::CursorEvent *event = (io::CursorEvent*)data.get();
-
-			if ((event->xOffset != 0.0f) || (event->yOffset != 0.0f)) {
-				updateOrientation(event->xOffset, event->yOffset);
-			}
-		}
+			adjustOrientation(event->xOffset, event->yOffset);
 			break;
+		}
+		case VXT_EVENT_SCROLL:
+		{
+			const io::ScrollEvent *event = (io::ScrollEvent*)data.get();
+			adjustZoom(event->yOffset);
+			break;
+		}
 		default:
 			break;
 	}
@@ -58,10 +67,10 @@ void FpsCamera::handle_event(uint event, std::shared_ptr<void> data)
 
 std::set<uint> FpsCamera::get_events(void) const
 {
-	return std::set<uint>{VXT_EVENT_KEY, VXT_EVENT_CURSOR};
+	return std::set<uint>{VXT_EVENT_KEY, VXT_EVENT_CURSOR, VXT_EVENT_SCROLL};
 }
 
-void FpsCamera::updateZoom(float yOffset)
+void FpsCamera::adjustZoom(float yOffset)
 {
 	Camera* camera = getCamera();
 	float zoom = camera->getZoom();
@@ -69,9 +78,13 @@ void FpsCamera::updateZoom(float yOffset)
 	zoom = ufw::math::clamp(zoom - yOffset, GETENV(VXT_MIN_ZOOM), GETENV(VXT_MAX_ZOOM));
 
 	camera->setZoom(zoom);
+
+#ifdef TRACE
+	std::printf("[%s] zoom=%.2f\n", TAG, zoom);
+#endif
 }
 
-void FpsCamera::updateOrientation(float xOffset, float yOffset)
+void FpsCamera::adjustOrientation(float xOffset, float yOffset)
 {
 	PerspectiveCamera *camera = dynamic_cast<PerspectiveCamera*>( getCamera() );
 	float yaw = camera->getYaw();
@@ -84,13 +97,17 @@ void FpsCamera::updateOrientation(float xOffset, float yOffset)
 
 	camera->setYaw(yaw);
 	camera->setPitch(pitch);
+
+#ifdef TRACE
+	std::printf("[%s] yaw=%.2f pitch=%.2f\n", TAG, yaw, pitch);
+#endif
 }
 
-void FpsCamera::updatePosition(Camera::Direction dir, float dt)
+void FpsCamera::adjustPosition(Camera::Direction dir, int mods, float dt)
 {
-	const float velocity = GETENV(VXT_MOVEMENT_SPEED) * dt;
+	const float weight = (mods & GLFW_MOD_SHIFT) ? 10.0f : 1.0f;
+	const float velocity = (GETENV(VXT_MOVEMENT_SPEED) * dt) * weight;
 	Camera *camera = getCamera();
-	const glm::vec3 prevPos{camera->getPosition()};
 
 	switch (dir) {
 		case Camera::FORWARD:
@@ -111,21 +128,20 @@ void FpsCamera::updatePosition(Camera::Direction dir, float dt)
 		case Camera::DOWN:
 			camera->sub(camera->getUp() * velocity);
 			break;
+		default:
 		case Camera::UNKNOWN:
 			break;
 	}
 
 #ifdef TRACE
-	if (camera->getPosition() != prevPos) {
-		std::printf("[%s] x=%.2f y=%.2f z=%.2f\n", TAG,
-			camera->m_position.x, camera->m_position.y, camera->m_position.z);
-	}
+	std::printf("[%s] x=%.2f y=%.2f z=%.2f\n", TAG,
+		camera->m_position.x, camera->m_position.y, camera->m_position.z);
 #endif
 }
 
-Camera::Direction FpsCamera::keyEventToDirection(const io::KeyEvent *event) const
+Camera::Direction FpsCamera::keyCodeToDirection(int keyCode) const
 {
-	switch (event->keyCode) {
+	switch (keyCode) {
 		case GLFW_KEY_W:	
 			return Camera::FORWARD;
 		case GLFW_KEY_S:
@@ -141,17 +157,11 @@ Camera::Direction FpsCamera::keyEventToDirection(const io::KeyEvent *event) cons
 		default:
 			return Camera::UNKNOWN;
 	}
-
-	return Camera::UNKNOWN;
 }
 
 Camera* FpsCamera::getCamera(void)
 {
-	Camera *camera = NULL;
-
-	UFW_ASSERT((m_scene != NULL) && ("scene is NULL"));
-	camera = m_scene->getCamera();
+	Camera *camera = getScene()->getCamera();
 	UFW_ASSERT((camera != NULL) && ("camera is NULL"));
-
 	return camera;
 }

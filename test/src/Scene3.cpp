@@ -18,9 +18,9 @@ using namespace ecs;
 using namespace cmp;
 using namespace test;
 
-static const glm::vec3 position{0.0f, 0.0f, 0.0f};
-static float zNear;
-static float zFar;
+static const glm::vec3 position{0.0f, 0.0f, 200.0f};
+static const float zNear = 0.0f;
+static const float zFar = 10000.0f;
 static Box3 box;
 
 Scene3::Scene3(Window *window)
@@ -37,14 +37,14 @@ void Scene3::init(void)
 	addEntity(entity);
 
 	box = ShapeBuilder{}
-		.setStart({0.0f, 0.0f, 0.0f})
-		.setEnd({0.0f, 0.0f, 1.0f})
-		.setColor({255.0f, 255.0f, 255.0f})
-		.setWidth(4)
+		.setPos({0.5f, 0.0f, 0.0f})
+		.setSize({1.0f, 1.0f, 1.0f})
 		.setRotation(0.0f)
+		.setColor({255.0f, 255.0f, 255.0f})
+		.setWidth(4U)
 		.build<Box3>();
 
-	// initialize the base class
+	// initialize the base class, entities and components
 	Scene::init();
 }
 

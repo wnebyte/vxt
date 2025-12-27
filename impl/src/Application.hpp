@@ -5,17 +5,31 @@
 #include "Windowfwd.hpp"
 #include "rdr/Framebuffer.hpp"
 
+namespace vxt {
 class Application {
 public:
-	static void launch(int argc, char *argv[]);
-	static void init(void);
-	static vxt::Window* getWindow(void);
-	static float dt(void);
+	struct Configuration {};
 
-private:
-	static float m_dt;
-	static vxt::Window *m_window;
-	static vxt::rdr::Framebuffer m_framebuffer;
+public:
+	Application();
+	~Application() noexcept = default;
+
+public:
+	static float dt(void);
+	static Window* getWindow(void);
+	static rdr::Framebuffer& getFramebuffer(void);
+	static void launch(Application *app);
+
+protected:
+	virtual void init(Configuration &config);
+	virtual void run(void);
+
+protected:
+	float m_dt;
+	Window *m_window;
+	rdr::Framebuffer m_framebuffer;
+	static Application* m_app;
 };
+} // namespace vxt
 
 #endif // VXT_APPLICATION_HPP

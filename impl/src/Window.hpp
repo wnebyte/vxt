@@ -18,6 +18,8 @@ class Window {
 public:
 	static const uint32_t defaultWidth  = 1920;
 	static const uint32_t defaultHeight = 1080;
+	static const uint32_t maxWidth = 0;
+	static const uint32_t maxHeight = 0;
 
 public:
 	~Window();
@@ -54,7 +56,7 @@ public:
 	float getAspectRatio(void) const;
 	Scene* getScene(void);
 	void setScene(std::unique_ptr<Scene> &&scene);
-	static Window* create(const std::string &title, uint32_t width = defaultWidth, uint32_t height = defaultHeight);
+	static Window* create(const std::string &title, uint32_t width = maxWidth, uint32_t height = maxHeight);
 
 private:
 	void init(void);

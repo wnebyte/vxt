@@ -14,14 +14,17 @@ Texture::Texture(const Configuration &config)
 	, m_target(config.target)
 	, m_path(config.path)
 	, m_width(config.width)
-	, m_height(config.width)
+	, m_height(config.height)
 	, m_config(config)
 {
 }
 
-void Texture::init()
+void Texture::init(bool create)
 {
-	glGenTextures(1, &m_id);
+	if (create) {
+		glGenTextures(1, &m_id);
+	}
+
 	bind();
 
 	for (const Parameter &param : m_config.parameters) {
@@ -48,6 +51,13 @@ void Texture::init()
 		glTexImage2D(m_target, m_config.level, m_config.internalFormat, m_width, m_height,
 			m_config.border, m_config.format, m_config.type, NULL);
 	}
+}
+
+void Texture::resize(uint32_t width, uint32_t height)
+{
+	m_width = width;
+	m_height = height;
+	init(false);
 }
 
 void Texture::bind(void)

@@ -1,8 +1,0 @@
-ifndef DEFINES_MK
-DEFINES_MK := DEFFED
-
-.EXPORT_ALL_VARIABLES:
-
-VXT := ..
-
-endif # DEFINES_MK

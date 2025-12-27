@@ -17,9 +17,9 @@ in vec2 fUv;
 
 layout (location=0) out vec4 frag;
 
-uniform sampler2D screen;
+uniform sampler2D uScreen;
 
 void main(void)
 {
-    frag = vec4(texture(screen, fUv).rgb, 1.0);
+    frag = vec4(texture(uScreen, fUv).rgb, 1.0);
 }

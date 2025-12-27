@@ -6,16 +6,19 @@
 
 #include "Types.hpp"
 
-#define GETENV(env) (vxt::utl::getenv(#env, env))
+#define VXT_MOVEMENT_SPEED 7.5f
+#define VXT_MOUSE_SENSITIVITY 1.0f
 
-#define VXT_MOVEMENT_SPEED 5.0f
-#define VXT_MOUSE_SENSITIVITY 5.0f
-#define VXT_YAW_WEIGHT 1.7f
-#define VXT_PITCH_WEIGHT 0.1f
+#define VXT_YAW_WEIGHT 0.005f
+#define VXT_PITCH_WEIGHT 0.0005f
+
 #define VXT_MIN_PITCH -90.0f
 #define VXT_MAX_PITCH 90.0f
+
 #define VXT_MIN_ZOOM 1.0f
 #define VXT_MAX_ZOOM 90.0f
+
+#define GETENV(env) (vxt::utl::getenv(#env, env))
 
 namespace vxt {
 namespace utl

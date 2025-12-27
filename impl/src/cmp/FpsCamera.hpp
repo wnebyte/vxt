@@ -20,10 +20,10 @@ public: // event handler implementation
 
 private:
 	Camera* getCamera(void);
-	void updateZoom(float yOffset);
-	void updatePosition(Camera::Direction dir, float dt);
-	void updateOrientation(float xOffset, float yOffset);
-	Camera::Direction keyEventToDirection(const io::KeyEvent *event) const;
+	void adjustZoom(float yOffset);
+	void adjustPosition(Camera::Direction dir, int mods, float dt);
+	void adjustOrientation(float xOffset, float yOffset);
+	Camera::Direction keyCodeToDirection(int keyCode) const;
 };
 } // namespace cmp
 } // namespace vxt

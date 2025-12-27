@@ -95,6 +95,12 @@ struct Spr {
 	int32_t   entityId;
 };
 
+struct CrossHair {
+	glm::vec2 pos;
+	glm::vec2 size;
+	glm::vec3 color;
+};
+
 class ShapeBuilder {
 public:
 	ShapeBuilder()
@@ -116,6 +122,7 @@ public:
 		m_vertex2.pos = pos;
 		m_box2.pos = pos;
 		m_box2.pos = pos;
+		m_crossHair.pos = pos;
 		return *this;
 	}
 
@@ -167,6 +174,7 @@ public:
 		m_box2.color = color;
 		m_box3.color = color;
 		m_quad2.color = color;
+		m_crossHair.color = color;
 		return *this;
 	}
 
@@ -212,6 +220,7 @@ public:
 	{
 		m_box2.size = size;
 		m_quad2.size = size;
+		m_crossHair.size = size;
 		return *this;
 	}
 
@@ -240,13 +249,14 @@ private:
 	}
 
 private:
-	Vertex2 m_vertex2;
-	Vertex3 m_vertex3;
-	Line2   m_line2;
-	Line3   m_line3;
-	Box2    m_box2;
-	Box3    m_box3;
-	Quad2   m_quad2;
+	Vertex2   m_vertex2;
+	Vertex3   m_vertex3;
+	Line2     m_line2;
+	Line3     m_line3;
+	Box2      m_box2;
+	Box3      m_box3;
+	Quad2     m_quad2;
+	CrossHair m_crossHair;
 };
 
 template<>
@@ -301,6 +311,14 @@ template<>
 inline Quad2 ShapeBuilder::build<Quad2>(void)
 {
 	Quad2 shape = m_quad2;
+	clear();
+	return shape;
+}
+
+template<>
+inline CrossHair ShapeBuilder::build<CrossHair>(void)
+{
+	CrossHair shape = m_crossHair;
 	clear();
 	return shape;
 }

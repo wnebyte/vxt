@@ -5,16 +5,37 @@
 
 #include "Scene.hpp"
 #include "Window.hpp"
+#include "Application.hpp"
+
 #include "io/Mouse.hpp"
 #include "io/Keyboard.hpp"
 
+#define TRACE
 #define _GLFW_CONTEXT_VERSION_MAJOR 4
-#define _GLFW_CONTEXT_VERSION_MINOR 5
+#define _GLFW_CONTEXT_VERSION_MINOR 0
 
 using namespace vxt;
 using namespace io;
 
 Window* Window::m_window = NULL;
+
+static bool getMaxResolution(uint32_t *width, uint32_t *height)
+{
+	GLFWmonitor *monitor = glfwGetPrimaryMonitor();
+	int32_t size = 0;
+	bool rv = false;
+
+	if (monitor != NULL) {
+		const GLFWvidmode *modes = glfwGetVideoModes(monitor, &size);
+		if (size != 0) {
+			*width  = modes[size - 1].width;
+			*height = modes[size - 1].height;
+			rv = true;
+		}
+	}
+
+	return rv;
+}
 
 Window::Window(const std::string &title, uint32_t width, uint32_t height)
 	: m_title(title)
@@ -47,6 +68,8 @@ Window* Window::create(const std::string &title, uint32_t width, uint32_t height
 
 void Window::init(void)
 {
+	int w, h;
+
 	// Setup an error callback
 	glfwSetErrorCallback([](int, const char *msg) { std::cerr << msg << std::endl; });
 
@@ -65,7 +88,9 @@ void Window::init(void)
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 
-	glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
+	if ( (m_width == maxWidth) || (m_height == maxHeight) ) {
+		(void)getMaxResolution(&m_width, &m_height);
+	}
 
 	// Create the window
 	m_glfwWindow = glfwCreateWindow(m_width, m_height, m_title.c_str(), NULL, NULL);
@@ -91,9 +116,6 @@ void Window::init(void)
   	glfwSetScrollCallback(m_glfwWindow, [](GLFWwindow *window, double xOffset, double yOffset) { Mouse::scrollCallback(window, xOffset, yOffset); });
   	glfwSetKeyCallback(m_glfwWindow, [](GLFWwindow *window, int keyCode, int scanCode, int action, int mods) { Keyboard::keyCallback(window, keyCode, scanCode, action, mods); });
 
-	// Disable cursor
-	// setCursorMode(GLFW_CURSOR_DISABLED);
-
 	// Enable v-sync
 	glfwSwapInterval(1);
 
@@ -103,20 +125,33 @@ void Window::init(void)
 	// Make the window visible
 	glfwShowWindow(m_glfwWindow);
 
+	// Set the window size to the actual size of the window
+	glfwGetWindowSize(m_glfwWindow, &w, &h);
+	windowSizeCallback(m_glfwWindow, w, h);
+
 	// Update the viewport
-	glViewport(0, 0, m_width, m_height);
+	glfwGetFramebufferSize(m_glfwWindow, &w, &h);
+	framebufferSizeCallback(m_glfwWindow, w, h);
 }
 
 void Window::windowSizeCallback(GLFWwindow *window, int width, int height)
 {
 	m_width = width;
 	m_height = height;
+#ifdef TRACE
+	std::printf("[%s] windowSizeCallback w=%d h=%d\n",
+		"Window", width, height);
+#endif
 }
 
 void Window::framebufferSizeCallback(GLFWwindow *window, int width, int height)
 {
 	glViewport(0, 0, width, height);
-	/// TODO: resize framebuffer
+	Application::getFramebuffer().resize(width, height);
+#ifdef TRACE
+	std::printf("[%s] framebufferSizeCallback w=%d h=%d\n",
+		"Window", width, height);
+#endif
 }
 
 void Window::update(float dt)

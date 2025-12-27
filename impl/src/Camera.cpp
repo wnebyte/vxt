@@ -228,7 +228,7 @@ void Camera::mul(const glm::vec3 &position)
 
 void Camera::mul(const glm::vec2 &position)
 {
-	m_position *= glm::vec3{position, 0.0f};
+	m_position *= glm::vec3{position, 1.0f};
 }
 
 void Camera::div(const glm::vec3 &position)
@@ -238,7 +238,7 @@ void Camera::div(const glm::vec3 &position)
 
 void Camera::div(const glm::vec2 &position)
 {
-	m_position /= glm::vec3{position, 0.0f};
+	m_position /= glm::vec3{position, 1.0f};
 }
 
 void Camera::setHints(uint32_t hints)

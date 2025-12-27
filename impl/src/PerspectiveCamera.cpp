@@ -12,6 +12,7 @@ PerspectiveCamera::PerspectiveCamera(const glm::vec3 &position,
 									 const glm::vec3 &up,
 									 const glm::vec3 &right)
 	: Camera(position, zNear, zFar, aspectRatio, forward, up, right)
+	, m_wUp(up)
 	, m_yaw(yaw)
 	, m_pitch(pitch)
 {
@@ -25,7 +26,7 @@ void PerspectiveCamera::update(float dt)
 
 void PerspectiveCamera::adjustProjection(void)
 {
-	m_projectionMatrix = glm::perspective(glm::radians(m_zoom), m_aspectRatio, m_zNear, m_zFar);
+	m_projectionMatrix = glm::perspective(glm::radians(m_zoom), m_aspectRatio, m_position.z + 0.1f, m_position.z + 10000.0f);
 	m_inverseProjectionMatrix = glm::inverse(m_projectionMatrix);
 }
 

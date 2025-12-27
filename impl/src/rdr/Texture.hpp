@@ -34,7 +34,7 @@ public:
 	~Texture() noexcept = default;
 
 public:
-	void init(void);
+	void init(bool create = true);
 	void bind(void);
 	void unbind(void);
 	int32_t getId(void) const;
@@ -42,6 +42,7 @@ public:
 	uint32_t getWidth(void) const;
 	uint32_t getHeight(void) const;
 	std::string getPath(void) const;
+	void resize(uint32_t width, uint32_t height);
 
 private:
 	uint32_t      m_id;

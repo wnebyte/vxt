@@ -1,4 +1,5 @@
 #include "vxt/Window.hpp"
+#include "vxt/Application.hpp"
 
 #include "vxt/OrthoCamera.hpp"
 
@@ -29,8 +30,6 @@ static const float zFar = 100.0f;
 static const float projectionWidth = 6.0f;
 static const float projectionHeight = 3.0f;
 static Quad2 quad;
-static SpriteRender spr;
-static Transform transform;
 
 Scene2::Scene2(Window *window)
 	: Scene(window, std::make_unique<OrthoCamera>(position, zNear, zFar, window->getAspectRatio(), projectionWidth, projectionHeight))
@@ -42,17 +41,8 @@ void Scene2::init(void)
 	Entity         entity;
 	ShapeBuilder   builder;
 
-	transform.pos      = {1.0f, 1.0f, 10.0f};
-	transform.scale    = {1.0f, 1.0f, 0.0f};
-	transform.rotation = 0.0f;
-
-	spr.setColor({0.2f, 0.2f, 0.2f, 1.0f});
-	spr.setTexture(Assets::getTexture(TEXTURE_NAME));
-
 	entity.addComponent(std::make_shared<GridLines>());
 	entity.addComponent(std::make_shared<EditorCamera>());
-	entity.addComponent(transform);
-	entity.addComponent(spr);
 	addEntity(entity);
 
 	quad = builder.setPos({0.0f, 0.0f})
@@ -66,13 +56,11 @@ void Scene2::init(void)
 
 	// components need to have been initialized when spr batches are added
 	Scene::init();
-
-	BatchRenderer::add(entity);
 }
 
 void Scene2::update(float dt)
 {
-	// BatchRenderer::drawQuad2(quad);
+	BatchRenderer::drawQuad2(quad);
 	Scene::update(dt);
 	BatchRenderer::render(*getCamera());
 }

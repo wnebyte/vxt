@@ -1,0 +1,8 @@
+ifndef VXT_DEFINES_MK
+VXT_DEFINES_MK := DEFINED
+
+.EXPORT_ALL_VARIABLES:
+
+ARCH := $(shell uname -m)
+
+endif # VXT_DEFINES_MK

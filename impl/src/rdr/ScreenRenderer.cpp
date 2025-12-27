@@ -42,9 +42,6 @@ void ScreenRenderer::init(void)
 		{ 3, GL_FLOAT, sizeof(Vertex), (void*)0 },
 		{ 2, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, uv) }
 	});
-
-	glBindBuffer(GL_ARRAY_BUFFER, NO_ID);
-	glBindVertexArray(NO_ID);
 }
 
 void ScreenRenderer::render(Texture *screenTexture)
@@ -58,7 +55,7 @@ void ScreenRenderer::render(Texture *screenTexture)
 	shader->uploadTexture(SHADER_U_SCREEN, 0);
 
 	glBindVertexArray(vaoId);
-	glDrawArrays(GL_TRIANGLES, 0, ARRAY_SIZE(data));
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(NO_ID);
 
 	screenTexture->unbind();

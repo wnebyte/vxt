@@ -45,8 +45,7 @@ void Framebuffer::init(void)
 	}
 
 	UFW_ASSERT((glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) && ("framebuffer status is not complete"));
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	unbind();
 }
 
 void Framebuffer::bind(void)
@@ -61,7 +60,16 @@ void Framebuffer::unbind(void)
 
 void Framebuffer::resize(uint32_t width, uint32_t height)
 {
-	/// TODO: impl
+	m_width = width;
+	m_height = height;
+
+	for (Texture *colorAttachment : m_colorAttachments) {
+		colorAttachment->resize(width, height);
+	}
+
+	if (m_depthAttachment != NULL) {
+		m_depthAttachment->resize(width, height);
+	}
 }
 
 uint32_t Framebuffer::getId(void) const
@@ -86,7 +94,8 @@ std::size_t Framebuffer::getNumOfColorAttachments(void) const
 
 Texture* Framebuffer::getColorAttachment(uint32_t index)
 {
-	return m_colorAttachments[index];
+	return (index < getNumOfColorAttachments()) ?
+		m_colorAttachments[index] : throw std::out_of_range{"index is out of range"};
 }
 
 Texture* Framebuffer::getDepthAttachment(void)

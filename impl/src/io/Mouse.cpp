@@ -41,7 +41,7 @@ void Mouse::cursorPosCallback(GLFWwindow *window, double x, double y)
 	m_xPos = x;
 	m_yPos = y;
 
-	if (xOffset > 0.0f || yOffset > 0.0f) {
+	{
 		// handle mouse movement
 		std::shared_ptr<CursorEvent> event{new CursorEvent{}};
 		event->xOffset = xOffset;

@@ -232,6 +232,22 @@ void BatchRenderer::drawCube3(const Cube3 &cube)
 	/// TODO: impl
 }
 
+void BatchRenderer::drawCrossHair(const CrossHair &ch)
+{
+	const glm::vec2 halfSize = ch.size * 0.5f;
+	const int32_t zIndex = 0;  // TODO: add to CrossHair struct
+	const uint32_t width = 4U; // TODO: add to CrossHair struct
+
+	const Line2 v[2] = {
+		{ { ch.pos.x, ch.pos.y - halfSize.y }, { ch.pos.x, ch.pos.y + halfSize.y }, zIndex, ch.color, width },
+		{ { ch.pos.x - halfSize.x, ch.pos.y }, { ch.pos.x + halfSize.x, ch.pos.y }, zIndex, ch.color, width }
+	};
+
+	for (const Line2 &line : v) {
+		drawLine2(line);
+	}
+}
+
 void BatchRenderer::add(Entity &entity)
 {
 	SpriteRender *spr = entity.getComponent<SpriteRender>();

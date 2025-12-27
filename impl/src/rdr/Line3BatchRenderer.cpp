@@ -43,10 +43,10 @@ void Line3BatchRenderer::init(void)
 void Line3BatchRenderer::render(const Camera &camera)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, m_vboId);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(m_data), m_data);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GL_Line3) * m_size, m_data);
 
 	m_shader->attach();
-	m_shader->uploadMat4(SHADER_U_VIEW, camera.getProjectionMatrix());
+	m_shader->uploadMat4(SHADER_U_VIEW, camera.getViewMatrix());
 	m_shader->uploadMat4(SHADER_U_PROJECTION, camera.getProjectionMatrix());
 
 	glLineWidth(m_width);

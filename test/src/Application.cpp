@@ -9,6 +9,7 @@
 #include "vxt/Application.hpp"
 
 #include "vxt/utl/Assets.hpp"
+#include "vxt/utl/Constants.hpp"
 #include "vxt/utl/CmdHandler.hpp"
 
 #include "vxt/rdr/Builder.hpp"
@@ -25,39 +26,54 @@
 #define FBO_ACCUM "fbo.accum"
 #define FBO_REVEAL "fbo.reveal"
 #define FBO_DEPTH "fbo.depth"
+#define FBO_USE
+
+#define FLATTEN_VEC4(v) v.x, v.y, v.z, v.w
 
 using namespace vxt;
 using namespace rdr;
 using namespace utl;
 using namespace test;
 
-static ufw::thread* cmdHandler = NULL;
-float Application::m_dt = 0.0f;
-Window* Application::m_window = NULL;
-Framebuffer Application::m_framebuffer;
+class MyApplication : public Application {
+public:
+	MyApplication()
+		: Application()
+	{
+	}
 
-static void registerSigHandlers(void);
+public:
+	void init(Configuration &config) override;
+	void run(void) override;
+};
+
+static ufw::thread* cmdHandler = NULL;
+
 static void sigHandler(int sig);
 static void shutdown(void);
 
 int main(int argc, char* argv[])
 {
-	std::printf("started\n");
-	registerSigHandlers();
-	Application::launch(argc, argv);
-	return 0;
-}
+	MyApplication app;
 
-static void registerSigHandlers(void)
-{
-	// shut the process down orderly
-	signal(SIGKILL, sigHandler);
-	signal(SIGINT,  sigHandler);
-	signal(SIGTERM, sigHandler);
-	signal(SIGQUIT, sigHandler);
-	signal(SIGHUP,  sigHandler);
-	signal(SIGTSTP, sigHandler);
-	signal(SIGABRT, sigHandler);
+	std::printf("started\n");
+
+	{
+		// shut the process down orderly
+		signal(SIGHUP,  sigHandler);
+		signal(SIGINT,  sigHandler);
+		signal(SIGQUIT, sigHandler);
+		signal(SIGABRT, sigHandler);
+		signal(SIGKILL, sigHandler);
+		signal(SIGTERM, sigHandler);
+#ifndef _WIN32
+		signal(SIGTSTP, sigHandler);
+#endif
+	}
+
+	Application::launch(&app);
+
+	return 0;
 }
 
 static void sigHandler(int sig)
@@ -87,7 +103,7 @@ static void shutdown(void)
 	}
 }
 
-void Application::init(void)
+void MyApplication::init(Configuration &config)
 {
 	uint32_t w;
 	uint32_t h;
@@ -111,14 +127,17 @@ void Application::init(void)
 		.addParameter({GL_TEXTURE_MIN_FILTER, GL_LINEAR})
 		.addParameter({GL_TEXTURE_MAG_FILTER, GL_LINEAR})
 		.build<Texture::Configuration>();
+
 	accum = TextureBuilder{}
 		.setSize(w, h)
 		.setTarget(GL_TEXTURE_2D)
 		.setInternalFormat(GL_RGBA16F)
 		.setFormat(GL_RGBA)
+		.setType(GL_HALF_FLOAT)
 		.addParameter({GL_TEXTURE_MIN_FILTER, GL_LINEAR})
 		.addParameter({GL_TEXTURE_MAG_FILTER, GL_LINEAR})
 		.build<Texture::Configuration>();
+
 	reveal = TextureBuilder{}
 		.setSize(w, h)
 		.setTarget(GL_TEXTURE_2D)
@@ -128,6 +147,7 @@ void Application::init(void)
 		.addParameter({GL_TEXTURE_MIN_FILTER, GL_LINEAR})
 		.addParameter({GL_TEXTURE_MAG_FILTER, GL_LINEAR})
 		.build<Texture::Configuration>();
+
 	depth = TextureBuilder{}
 		.setSize(w, h)
 		.setTarget(GL_TEXTURE_2D)
@@ -144,7 +164,7 @@ void Application::init(void)
 		.addColorAttachment(Assets::getTexture(FBO_REVEAL, reveal))
 		.setDepthAttachment(Assets::getTexture(FBO_DEPTH, depth))
 		.build();
-	// m_framebuffer.init();
+	m_framebuffer.init();
 
 	// init cmdHandler
 	try {
@@ -166,34 +186,48 @@ void Application::init(void)
 	m_window->setScene(std::make_unique<Scene3>(m_window));
 }
 
-void Application::launch(int argc, char *argv[])
+void MyApplication::run(void)
 {
 	float currentFrame;
 	float lastFrame = 0.0f;
-
-	init();
 
 	while (!m_window->shouldClose()) {
 		currentFrame = glfwGetTime();
 		m_dt = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
+		// poll for events
 		m_window->pollEvents(m_dt);
-		m_window->update(m_dt);
+
+		{
+			// render window into application framebuffer
+
+			// set application framebuffer render states
+			glEnable(GL_DEPTH_TEST);
+			glDepthFunc(GL_LESS);
+
+			m_framebuffer.bind();
+			glDrawBuffers(3, BUFS_ZERO_NONE_NONE);
+			glClearBufferfv(GL_COLOR, 0, ZERO_FILLER_VEC);
+			glClearBufferfv(GL_DEPTH, 0, ONE_FILLER_VEC);
+			m_window->update(m_dt);
+		}
+
+		{
+			// render screen quad into default framebuffer
+
+			// set default framebuffer render states
+			glDisable(GL_DEPTH_TEST);
+			glDepthMask(GL_TRUE);
+
+			Framebuffer::unbind();
+			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+			ScreenRenderer::render(m_framebuffer.getColorAttachment(0));
+		}
+
+		// swap buffers and end frame
 		m_window->swapBuffers();
 		m_window->endFrame();
 	}
-}
-
-Window* Application::getWindow(void)
-{
-	return m_window;
-}
-
-float Application::dt(void)
-{
-	return m_dt;
 }

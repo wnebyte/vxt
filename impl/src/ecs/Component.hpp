@@ -25,7 +25,7 @@ protected:
 
 public:
 	uint32_t m_entity;
-	Scene *m_scene;
+	Scene   *m_scene;
 };
 } // namespace ecs
 } // namespace vxt
