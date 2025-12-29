@@ -17,8 +17,6 @@ public:
 	static rdr::Texture* getTexture(const std::string &name, rdr::Texture::Configuration config);
 	static void setTexture(const std::string &name, rdr::Texture *texture);
 	static void destroy(void);
-
-private:
 	static std::string toPath(const std::string &name, const std::string &type);
 
 private:

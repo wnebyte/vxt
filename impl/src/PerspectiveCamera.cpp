@@ -26,7 +26,7 @@ void PerspectiveCamera::update(float dt)
 
 void PerspectiveCamera::adjustProjection(void)
 {
-	m_projectionMatrix = glm::perspective(glm::radians(m_zoom), m_aspectRatio, m_position.z + 0.1f, m_position.z + 10000.0f);
+	m_projectionMatrix = glm::perspective(glm::radians(m_zoom), m_aspectRatio, m_zNear, m_zFar);
 	m_inverseProjectionMatrix = glm::inverse(m_projectionMatrix);
 }
 

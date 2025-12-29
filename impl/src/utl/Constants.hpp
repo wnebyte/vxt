@@ -1,6 +1,8 @@
 #ifndef VXT_CONSTANTS_HPP
 #define VXT_CONSTANTS_HPP
 
+#include <glad/glad.h>
+
 #include "Types.hpp"
 
 #define ZERO_FILLER_VEC2 (glm::vec2{0.0f, 0.0f})
@@ -30,9 +32,9 @@ extern float ZERO_FILLER_VEC[4];
 
 extern float ONE_FILLER_VEC[4];
 
-extern uint32_t BUFS_ZERO_NONE_NONE[3];
+extern GLenum BUFS_ZERO_NONE_NONE[3];
 
-extern uint32_t BUFS_NONE_ONE_TWO[3];
+extern GLenum BUFS_NONE_ONE_TWO[3];
 } // namespace utl
 } // namespace vxt
 

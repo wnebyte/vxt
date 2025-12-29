@@ -11,11 +11,24 @@ void setVertexAttributes(const std::initializer_list<VertexAttribute> &attrs)
 
 	for (const VertexAttribute &attr : attrs) {
 		switch (attr.type) {
+			case GL_HALF_FLOAT:
 			case GL_FLOAT:
-				glVertexAttribPointer(index, attr.size, GL_FLOAT, false, attr.stride, attr.offset);
+			case GL_FIXED:
+			case GL_INT_2_10_10_10_REV:
+			case GL_UNSIGNED_INT_2_10_10_10_REV:
+			case GL_UNSIGNED_INT_10F_11F_11F_REV:
+				glVertexAttribPointer(index, attr.size, attr.type, false, attr.stride, attr.offset);
 				break;
+			case GL_BYTE:
+			case GL_UNSIGNED_BYTE:
+			case GL_SHORT:
+			case GL_UNSIGNED_SHORT:
 			case GL_INT:
-				glVertexAttribIPointer(index, attr.size, GL_INT, attr.stride, attr.offset);
+			case GL_UNSIGNED_INT:
+				glVertexAttribIPointer(index, attr.size, attr.type, attr.stride, attr.offset);
+				break;
+			case GL_DOUBLE:
+				glVertexAttribLPointer(index, attr.size, attr.type, attr.stride, attr.offset);
 				break;
 			default:
 				break;

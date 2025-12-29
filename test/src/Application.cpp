@@ -12,6 +12,7 @@
 #include "vxt/utl/Constants.hpp"
 #include "vxt/utl/CmdHandler.hpp"
 
+#include "vxt/rdr/Skybox.hpp"
 #include "vxt/rdr/Builder.hpp"
 #include "vxt/rdr/Texture.hpp"
 #include "vxt/rdr/Framebuffer.hpp"
@@ -179,7 +180,8 @@ void MyApplication::init(Configuration &config)
 		std::exit(EXIT_FAILURE);
 	}
 
-	// init ScreenRenderer
+	// init renderers
+	Skybox::init();
 	ScreenRenderer::init();
 
 	// set the scene

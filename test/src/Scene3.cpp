@@ -4,6 +4,7 @@
 #include "vxt/Window.hpp"
 #include "vxt/PerspectiveCamera.hpp"
 
+#include "vxt/rdr/Skybox.hpp"
 #include "vxt/rdr/Shapes.hpp"
 #include "vxt/rdr/BatchRenderer.hpp"
 
@@ -19,7 +20,7 @@ using namespace cmp;
 using namespace test;
 
 static const glm::vec3 position{0.0f, 0.0f, 200.0f};
-static const float zNear = 0.0f;
+static const float zNear = 0.1f;
 static const float zFar = 10000.0f;
 static Box3 box;
 
@@ -52,5 +53,6 @@ void Scene3::update(float dt)
 {
 	Scene::update(dt);
 	BatchRenderer::drawBox3(box);
+	Skybox::render(*getCamera()); // draw skybox as first object in scene
 	BatchRenderer::render(*getCamera());
 }

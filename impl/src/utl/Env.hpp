@@ -12,8 +12,8 @@
 #define VXT_YAW_WEIGHT 0.005f
 #define VXT_PITCH_WEIGHT 0.0005f
 
-#define VXT_MIN_PITCH -90.0f
-#define VXT_MAX_PITCH 90.0f
+#define VXT_MIN_PITCH -2.0f // -90.0f
+#define VXT_MAX_PITCH 2.0f  // 90.0f
 
 #define VXT_MIN_ZOOM 1.0f
 #define VXT_MAX_ZOOM 90.0f

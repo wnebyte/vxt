@@ -5,6 +5,7 @@
 
 #define SHADER_U_PROJECTION "uProjection"
 #define SHADER_U_VIEW "uView"
+#define SHADER_U_TEXTURE "uTexture"
 #define SHADER_U_TEXTURES "uTextures"
 #define SHADER_U_ACCUM "uAccum"
 #define SHADER_U_REVEAL "uReveal"
@@ -13,6 +14,7 @@
 #define SHADER_U_IS_WORLD_SPACE "uIsWorldSpace"
 #define SHADER_U_INVERSE_PROJECTION "uInverseProjection"
 #define SHADER_U_INVERSE_VIEW "uInverseView"
+#define SHADER_U_CUBEMAP "uCubemap"
 
 namespace vxt {
 namespace rdr
