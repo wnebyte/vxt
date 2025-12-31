@@ -1,8 +1,11 @@
 #include "Scene.hpp"
 #include "Window.hpp"
 
+#include "anim/Animation.hpp"
+
 using namespace vxt;
 using namespace ecs;
+using namespace anim;
 
 Scene::Scene()
 	: Scene(NULL)
@@ -39,6 +42,16 @@ void Scene::update(float dt)
 
 	for (uint i = 0; i < m_entities.size(); ++i) {
 		m_entities[i].update(dt);
+	}
+
+	for (anim_it iter = m_animations.begin(); iter != m_animations.end();) {
+		(*iter)->update(dt);
+
+		if ((*iter)->hasEnded()) {
+			iter = m_animations.erase(iter);
+		} else {
+			++iter;
+		}
 	}
 }
 
@@ -159,4 +172,15 @@ Scene::entity_cit Scene::findEntity(const std::string &name) const
 	}
 
 	return rv;
+}
+
+void Scene::addAnimation(std::shared_ptr<Animation> animation)
+{
+	m_animations.push_back(animation);
+	animation->start();
+}
+
+std::vector<std::shared_ptr<Animation>>& Scene::getAnimations(void)
+{
+	return m_animations;
 }

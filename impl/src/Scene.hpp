@@ -8,12 +8,15 @@
 #include "Camera.hpp"
 #include "Windowfwd.hpp"
 #include "ecs/Entity.hpp"
+#include "anim/Animationfwd.hpp"
 
 namespace vxt {
 class Scene {
 private:
 	using entity_it  = std::vector<ecs::Entity>::iterator;
 	using entity_cit = std::vector<ecs::Entity>::const_iterator;
+	using anim_it    = std::vector<std::shared_ptr<anim::Animation>>::iterator;
+	using anim_cit   = std::vector<std::shared_ptr<anim::Animation>>::const_iterator;
 
 public:
 	Scene();
@@ -32,7 +35,7 @@ public:
 	Camera* getCamera(void);
 	void setCamera(std::unique_ptr<Camera> &&camera);
 
-public:
+public: // entity
 	const ecs::Entity& getEntity(uint32_t id) const;
 	ecs::Entity& getEntity(uint32_t id);
 	const ecs::Entity& getEntity(const std::string &name) const;
@@ -43,6 +46,10 @@ public:
 	bool removeEntity(const std::string &name);
 	bool addEntity(const ecs::Entity &entity);
 
+public: // animation
+	void addAnimation(std::shared_ptr<anim::Animation> animation);
+	std::vector<std::shared_ptr<anim::Animation>>& getAnimations(void);
+
 private:
 	entity_cit findEntity(uint32_t id) const;
 	entity_cit findEntity(const std::string &name) const;
@@ -51,6 +58,7 @@ protected:
 	Window *m_window;
 	std::unique_ptr<Camera> m_camera;
 	std::vector<ecs::Entity> m_entities;
+	std::vector<std::shared_ptr<anim::Animation>> m_animations;
 };
 } // namespace vxt
 
