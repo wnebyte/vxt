@@ -39,4 +39,4 @@ private:
 } // namespace cmp
 } // namespace vxt
 
-#endif // VXT_SPRITE_RENDERER_HPP
+#endif // VXT_SPRITE_RENDER_HPP

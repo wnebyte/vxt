@@ -20,6 +20,7 @@ void BatchRenderer::drawLine2(const Line2 &line)
 	// try to find an existing batch
 	for (auto &batch : m_line2Batches) {
 		if (batch.add(line)) {
+			// line was added into an existing batch
 			return;
 		}
 	}
@@ -40,6 +41,7 @@ void BatchRenderer::drawLine3(const Line3 &line)
 	// try to find an existing batch
 	for (auto &batch : m_line3Batches) {
 		if (batch.add(line)) {
+			// line was added into an existing batch
 			return;
 		}
 	}
@@ -60,6 +62,7 @@ void BatchRenderer::drawVertex2(const Vertex2 &vertex)
 	// try to find an existing batch
 	for (auto &batch : m_vertex2Batches) {
 		if (batch.add(vertex)) {
+			// vertex was added into an existing batch
 			return;
 		}
 	}
@@ -80,6 +83,7 @@ void BatchRenderer::drawVertex3(const Vertex3 &vertex)
 	// try to find an existing batch
 	for (auto &batch : m_vertex3Batches) {
 		if (batch.add(vertex)) {
+			// vertex was added into an existing batch
 			return;
 		}
 	}
@@ -100,6 +104,7 @@ void BatchRenderer::addSpr(SpriteRender *spr)
 	// try to find an existing batch
 	for (auto &batch : m_spriteBatches) {
 		if (batch.add(spr)) {
+			// spr was added into an existing batch
 			return;
 		}
 	}
@@ -259,13 +264,15 @@ void BatchRenderer::add(Entity &entity)
 
 void BatchRenderer::render(const Camera &camera)
 {
-	// strange stuff happens if m_batches is sorted directly
-	std::vector<Renderer*> batches{m_batches.begin(), m_batches.end()};
+	if (!m_batches.empty()) {
+		// strange stuff happens when m_batches is sorted directly
+		std::vector<Renderer*> batches{m_batches.begin(), m_batches.end()};
 
-	std::sort(batches.begin(), batches.end(), &Renderer::compareTo);
+		std::sort(batches.begin(), batches.end(), &Renderer::compareTo);
 
-	for (Renderer *batch : batches) {
-		batch->render(camera);
+		for (Renderer *batch : batches) {
+			batch->render(camera);
+		}
 	}
 }
 

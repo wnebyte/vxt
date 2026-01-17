@@ -64,7 +64,7 @@ Framebuffer FramebufferBuilder::build(void) const
 ///////////////////////////////
 
 TextureBuilder::TextureBuilder()
-	: m_config({GL_TEXTURE_2D, 0, 0, 0, 0, 0, 0, 0, {}, "", false})
+	: m_config({GL_TEXTURE_2D, 0, 0, 0, 0, 0, 0, 0, {}, {}, "", false})
 {
 }
 
@@ -144,5 +144,22 @@ TextureBuilder& TextureBuilder::setParameters(const std::vector<Texture::Paramet
 TextureBuilder& TextureBuilder::addParameter(const Texture::Parameter &param)
 {
 	m_config.parameters.push_back(param);
+	return *this;
+}
+
+TextureBuilder& TextureBuilder::addParameter(GLenum name, GLint value)
+{
+	return addParameter({name, value});
+}
+
+TextureBuilder& TextureBuilder::setImages(const std::vector<Image> &images)
+{
+	m_config.images = images;
+	return *this;
+}
+
+TextureBuilder& TextureBuilder::addImage(const Image &image)
+{
+	m_config.images.push_back(image);
 	return *this;
 }

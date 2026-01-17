@@ -1,15 +1,10 @@
 #include <glad/glad.h>
 
-#include "utl/Assets.hpp"
-#include "rdr/Shader.hpp"
 #include "rdr/RenderUtil.hpp"
 #include "rdr/ScreenRenderer.hpp"
 
-#define SHADER_NAME "screen.glsl"
-
 using namespace vxt;
 using namespace rdr;
-using namespace utl;
 
 struct Vertex {
 	glm::vec3 pos;
@@ -44,20 +39,9 @@ void ScreenRenderer::init(void)
 	});
 }
 
-void ScreenRenderer::render(Texture *screenTexture)
+void ScreenRenderer::render(void)
 {
-	Shader *shader = Assets::getShader(SHADER_NAME);
-
-	shader->attach();
-
-	glActiveTexture(GL_TEXTURE0);
-	screenTexture->bind();
-	shader->uploadTexture(SHADER_U_SCREEN, 0);
-
 	glBindVertexArray(vaoId);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(NO_ID);
-
-	screenTexture->unbind();
-	shader->detach();
 }

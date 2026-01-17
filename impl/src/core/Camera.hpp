@@ -100,7 +100,6 @@ protected:
     glm::mat4 m_inverseViewMatrix;
 	uint32_t  m_hints;
 };
-
 } // namespace vxt
 
 #endif // VXT_CAMERA_HPP

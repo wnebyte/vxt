@@ -31,7 +31,30 @@ void Texture::init(bool create)
 		glTexParameteri(m_target, param.name, param.value);
 	}
 
-	if (ufw::fs::exists(m_path)) {
+	if (m_target == GL_TEXTURE_2D_ARRAY) {
+		GLenum format;
+		GLsizei imageCount;
+		const std::vector<Image> &images = m_config.images;
+
+		UFW_ASSERT((images.size() > 0) && ("images is empty"));
+
+		imageCount = images.size();
+		format     = (images[0].channels == 3) ? GL_RGB : GL_RGBA;
+		m_width    = images[0].width;
+		m_height   = images[0].height;
+
+		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, format, m_width, m_height,
+			imageCount, 0, format, GL_UNSIGNED_BYTE, NULL);
+
+		for (int i = 0; i < imageCount; ++i) {
+			glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0,
+				0, 0, i, m_width, m_height, 1,
+				format, GL_UNSIGNED_BYTE, images[i].data);
+			delete images[i].data;
+		}
+
+		glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
+	} else if (ufw::fs::exists(m_path)) {
 		int channels;
 		uint8_t *image = NULL;
 
@@ -75,7 +98,7 @@ int32_t Texture::getId(void) const
 	return (m_id != NO_ID) ? m_id : NO_TEX_ID;
 }
 
-uint32_t Texture::getTarget(void) const
+GLenum Texture::getTarget(void) const
 {
 	return m_target;
 }

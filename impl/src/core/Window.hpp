@@ -9,15 +9,8 @@
 class GLFWwindow;
 
 namespace vxt {
-struct Viewport {
-	glm::vec2 pos;
-	glm::vec2 size;
-};
-
 class Window {
 public:
-	static const uint32_t defaultWidth  = 1920;
-	static const uint32_t defaultHeight = 1080;
 	static const uint32_t maxWidth = 0;
 	static const uint32_t maxHeight = 0;
 
@@ -52,7 +45,6 @@ public:
 	std::string getTitle(void) const;
 	uint32_t getWidth(void) const;
 	uint32_t getHeight(void) const;
-	Viewport getViewport(void) const;
 	float getAspectRatio(void) const;
 	Scene* getScene(void);
 	void setScene(std::unique_ptr<Scene> &&scene);
@@ -68,11 +60,9 @@ private:
 	std::string            m_title;
 	uint32_t               m_width;
 	uint32_t               m_height;
-	Viewport               m_viewport; // NOT the OpenGL viewport
 	std::unique_ptr<Scene> m_scene;
 	static Window         *m_window;
 };
-
 } // namespace vxt
 
 #endif // VXT_WINDOW_HPP

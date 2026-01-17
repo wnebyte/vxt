@@ -27,7 +27,7 @@ public:
 	/// @param faces Array of filepaths
 	void init(const std::array<std::string, 6> &faces);
 	void bind(void);
-	void unbind(void);
+	static void unbind(void);
 	GLuint getId(void) const;
 
 private:

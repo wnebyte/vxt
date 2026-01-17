@@ -16,6 +16,7 @@ public:
 
 public:
 	static float dt(void);
+	static float getTime(void);
 	static Window* getWindow(void);
 	static rdr::Framebuffer& getFramebuffer(void);
 	static void launch(Application *app);
@@ -26,6 +27,7 @@ protected:
 
 protected:
 	float m_dt;
+	float m_currentFrame;
 	Window *m_window;
 	rdr::Framebuffer m_framebuffer;
 	static Application* m_app;

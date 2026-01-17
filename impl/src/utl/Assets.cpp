@@ -5,10 +5,6 @@
 #include "Assets.hpp"
 #include "rdr/Shader.hpp"
 
-#define VXT_ASSETS_DIR "VXT_ASSETS_DIR"
-#define SHADERS_DIRNAME "shaders"
-#define IMAGES_DIRNAME "images"
-
 using namespace vxt;
 using namespace utl;
 using namespace rdr;
@@ -18,7 +14,7 @@ using tex_it = std::map<std::string, Texture*>::iterator;
 
 std::map<std::string, Shader*> Assets::m_shaders;
 std::map<std::string, Texture*> Assets::m_textures;
-Texture::Configuration Assets::m_defaultTextureConfig{
+const Texture::Configuration Assets::m_defaultTextureConfig{
 	GL_TEXTURE_2D, 0, 0, 0, 0, 0, 0, 0,
 	{
 		{GL_TEXTURE_WRAP_S, GL_REPEAT},
@@ -26,12 +22,14 @@ Texture::Configuration Assets::m_defaultTextureConfig{
 		{GL_TEXTURE_MIN_FILTER, GL_NEAREST},
 		{GL_TEXTURE_MAG_FILTER, GL_NEAREST}
 	},
+	{},
 	"", false
 };
+const std::string Assets::m_types[] = { "images", "shaders" };
 
 Shader* Assets::getShader(const std::string &name)
 {
-	const std::string path{toPath(name, SHADERS_DIRNAME)};
+	const std::string path{getPath(name, SHADERS)};
 	const shader_it iter{m_shaders.find(path)};
 
 	if (iter != m_shaders.end()) {
@@ -53,7 +51,7 @@ Texture* Assets::getTexture(const std::string &name)
 
 Texture* Assets::getTexture(const std::string &name, Texture::Configuration config)
 {
-	const std::string path{toPath(name, IMAGES_DIRNAME)};
+	const std::string path{getPath(name, IMAGES)};
 	const tex_it iter{m_textures.find(path)};
 
 	if (iter != m_textures.end()) {
@@ -72,7 +70,7 @@ Texture* Assets::getTexture(const std::string &name, Texture::Configuration conf
 
 void Assets::setTexture(const std::string &name, Texture *texture)
 {
-	const std::string path{toPath(name, IMAGES_DIRNAME)};
+	const std::string path{getPath(name, IMAGES)};
 	const tex_it iter{m_textures.find(path)};
 
 	if (iter != m_textures.end()) {
@@ -85,11 +83,21 @@ void Assets::setTexture(const std::string &name, Texture *texture)
 	}
 }
 
-std::string Assets::toPath(const std::string &name, const std::string &type)
+std::string Assets::getPath(const std::string &name, const std::string &type)
 {
-	static const char *env = getenv(VXT_ASSETS_DIR);
+	static const char *env = getenv("VXT_ASSETS_DIR");
 	UFW_ASSERT((env != NULL) && ("VXT_ASSETS_DIR is not set"));
 	return ufw::fs::join_path(env, {type, name});
+}
+
+std::string Assets::getPath(const std::string &name, Type type)
+{
+	return getPath(name, getName(type));
+}
+
+std::string Assets::getName(Type type)
+{
+	return (type < SIZE) ? m_types[type] : "";
 }
 
 void Assets::destroy(void)

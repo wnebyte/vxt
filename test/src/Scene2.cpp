@@ -15,7 +15,7 @@
 
 #include "Scene2.hpp"
 
-#define TEXTURE_NAME "dark_oak_log.png"
+#define TEXTURE_NAME "blocks/dark_oak_log.png"
 
 using namespace vxt;
 using namespace rdr;

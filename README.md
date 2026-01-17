@@ -38,3 +38,15 @@ sudo sysctl -w kernel.core_pattern=/tmp/core-%e.%p.%h.%t
 -Wl,--subsystem,windows
 
 _POSIX_C_SOURCE >= 200112L
+
+COMPILE.cpp = \$(CXX) \$(CXXFLAGS) \$(CPPFLAGS) \$(TARGET_ARCH) -c
+
+LINK.cpp = \$(CXX) \$(CXXFLAGS) \$(CPPFLAGS) \$(LDFLAGS) \$(TARGET_ARCH)
+
+<code>
+@-mkdir -p $(@D)<br>
+@set -e; rm -f $@; \<br>
+$(CXX) -MM $(CPPFLAGS) $(INCLUDES) $< > $@.$$$$; \<br>
+sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \<br>
+rm -f $@.$$$$
+</code>

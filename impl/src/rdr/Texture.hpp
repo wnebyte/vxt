@@ -3,7 +3,10 @@
 
 #include <vector>
 
+#include <glad/glad.h>
+
 #include "Types.hpp"
+#include "rdr/Image.hpp"
 
 namespace vxt {
 namespace rdr
@@ -11,20 +14,21 @@ namespace rdr
 class Texture {
 public:
 	struct Parameter {
-		uint32_t name;
-		uint32_t value;
+		GLenum name;
+		GLint  value;
 	};
 
 	struct Configuration {
-		uint32_t target;
-		uint32_t level;
-		uint32_t internalFormat;
-		uint32_t width;
-		uint32_t height;
-		uint32_t border;
-		uint32_t format;
-		uint32_t type;
+		GLenum  target;
+		GLint   level;
+		GLint   internalFormat;
+		GLsizei width;
+		GLsizei height;
+		GLint   border;
+		GLenum  format;
+		GLenum  type;
 		std::vector<Parameter> parameters;
+		std::vector<Image> images;
 		std::string path;
 		bool flip;
 	};
@@ -38,19 +42,19 @@ public:
 	void bind(void);
 	void unbind(void);
 	int32_t getId(void) const;
-	uint32_t getTarget(void) const;
+	GLenum getTarget(void) const;
 	uint32_t getWidth(void) const;
 	uint32_t getHeight(void) const;
 	std::string getPath(void) const;
 	void resize(uint32_t width, uint32_t height);
 
 private:
-	uint32_t      m_id;
-	uint32_t      m_target;
-	std::string   m_path;
-	uint32_t      m_width;
-	uint32_t      m_height;
-	Configuration m_config;
+	GLuint         m_id;
+	GLenum         m_target;
+	std::string    m_path;
+	uint32_t       m_width;
+	uint32_t       m_height;
+	Configuration  m_config;
 };
 } // namespace rdr
 } // namespace vxt

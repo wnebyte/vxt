@@ -23,7 +23,7 @@ void Animation::cancel(void)
 void Animation::start(void)
 {
 	m_started = true;
-	m_timeLeft = getDuration();
+	m_timeLeft = m_duration;
 }
 
 void Animation::update(float dt)

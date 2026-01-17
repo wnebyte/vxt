@@ -78,6 +78,7 @@ public:
 	/// @brief Indicates whether this animation has started or not.
 	bool hasStarted(void) const;
 
+	/// @brief Indicates whether this animation is running or not.
 	bool isRunning(void) const;
 
 protected:

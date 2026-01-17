@@ -1,8 +1,6 @@
 #ifndef VXT_DRAW_COMMAND_HPP
 #define VXT_DRAW_COMMAND_HPP
 
-#include <glad/glad.h>
-
 #include "Types.hpp"
 
 namespace vxt {

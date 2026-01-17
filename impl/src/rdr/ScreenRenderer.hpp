@@ -10,7 +10,7 @@ namespace rdr
 class ScreenRenderer {
 public:
 	static void init(void);
-	static void render(Texture *screenTexture);
+	static void render(void);
 };
 } // namespace rdr
 } // namespace vxt

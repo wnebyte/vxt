@@ -4,12 +4,18 @@
 #include "rdr/RenderUtil.hpp"
 #include "rdr/Framebuffer.hpp"
 #include "rdr/ChunkRenderer.hpp"
+#include "rdr/ScreenRenderer.hpp"
 
 #include "utl/Assets.hpp"
 #include "utl/Constants.hpp"
 
 #define VERTEX_CAPACITY 10000
-#define COMPOSITE_SHADERNAME "composite.glsl"
+
+#define TEXTURE_NAME "texture3"
+#define OPAQUE_SHADER_NAME "opaque.glsl"
+#define TRANSPARENT_SHADER_NAME "transparent.glsl"
+#define BLENDABLE_SHADER_NAME "blendable.glsl"
+#define COMPOSITE_SHADER_NAME "composite.glsl"
 
 using namespace vxt;
 using namespace rdr;
@@ -19,9 +25,10 @@ ChunkRenderer::ChunkRenderer()
 	: m_vaoId(NO_ID)
 	, m_vboId(NO_ID)
 	, m_ccboId(NO_ID)
-	, m_opaqueShader(NULL)
-	, m_transparentShader(NULL)
-	, m_blendableShader(NULL)
+	, m_texture(Assets::getTexture(TEXTURE_NAME))
+	, m_opaqueShader(Assets::getShader(OPAQUE_SHADER_NAME))
+	, m_transparentShader(Assets::getShader(TRANSPARENT_SHADER_NAME))
+	, m_blendableShader(Assets::getShader(BLENDABLE_SHADER_NAME))
 	, m_opaqueDrawCommands()
 	, m_transparentDrawCommands()
 	, m_blendableDrawCommands()
@@ -31,10 +38,10 @@ ChunkRenderer::ChunkRenderer()
 
 void ChunkRenderer::init(void)
 {
-	uint32_t            size;
-	uint32_t            subBufferSize;
-	uint32_t            flags;
-	uint8_t            *buffer;
+	GLsizeiptr     size;
+	GLsizeiptr     subchunkSize;
+	GLbitfield     flags;
+	uint8_t       *buffer;
 
 	glGenVertexArrays(1, &m_vaoId);
 	glBindVertexArray(m_vaoId);
@@ -47,13 +54,13 @@ void ChunkRenderer::init(void)
 	});
 
 	size = SUBCHUNK_CAPACITY * (VERTEX_CAPACITY * sizeof(GLuint));
-	subBufferSize = size / SUBCHUNK_CAPACITY;
+	subchunkSize = size / SUBCHUNK_CAPACITY;
 	flags = GL_MAP_PERSISTENT_BIT | GL_MAP_WRITE_BIT | GL_MAP_COHERENT_BIT;
 
 	glBufferStorage(GL_ARRAY_BUFFER, size, NULL, flags);
 	buffer = static_cast<uint8_t*>( glMapBufferRange(GL_ARRAY_BUFFER, 0, size, flags) );
 
-	for (uint offset = 0, i = 0; (offset <= (size - subBufferSize)) && (i < SUBCHUNK_CAPACITY); offset += subBufferSize, ++i) {
+	for (uint offset = 0, i = 0; (offset <= (size - subchunkSize)) && (i < SUBCHUNK_CAPACITY); offset += subchunkSize, ++i) {
 		uint8_t *subBuffer = &(buffer[offset]);
 		// init subchunk
 	}
@@ -64,7 +71,7 @@ void ChunkRenderer::init(void)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(m_chunkCoords), NULL, GL_DYNAMIC_DRAW);
 
 	setVertexAttributes({
-		{ .size = 2, .type = GL_INT, .stride = sizeof(glm::ivec2), .offset = (void*)0 }
+		{ 2, GL_INT, sizeof(glm::ivec2), (void*)0 }
 	});
 	glVertexAttribDivisor(1, 1);
 }
@@ -75,19 +82,22 @@ void ChunkRenderer::draw(const Camera &camera, Shader *shader, DrawCommandVec *d
 	glBindBuffer(GL_ARRAY_BUFFER, m_ccboId);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(m_chunkCoords), m_chunkCoords);
 
+	// upload matrices
 	shader->attach();
 	shader->uploadMat4(SHADER_U_VIEW, camera.getViewMatrix());
 	shader->uploadMat4(SHADER_U_PROJECTION, camera.getProjectionMatrix());
 
+	// upload texture
 	glActiveTexture(GL_TEXTURE0);
-	// bind 3D texture
+	m_texture->bind();
 	shader->uploadTexture(SHADER_U_TEXTURE, 0);
 
+	// issue draw call
 	glBindVertexArray(m_vaoId);
 	glMultiDrawArraysIndirect(GL_TRIANGLES, drawCommands->data(), drawCommands->size(), sizeof(DrawArraysIndirectCommand));
 	glBindVertexArray(NO_ID);
 
-	glBindTexture(GL_TEXTURE_2D, NO_ID);
+	m_texture->unbind();
 	shader->detach();
 }
 
@@ -144,7 +154,7 @@ void ChunkRenderer::render(const Camera &camera)
 
 	if (compose) {
 		Framebuffer &framebuffer = Application::getFramebuffer();
-		shader = Assets::getShader(COMPOSITE_SHADERNAME);
+		shader = Assets::getShader(COMPOSITE_SHADER_NAME);
 
 		// set render states
 		glDepthFunc(GL_ALWAYS);
@@ -161,7 +171,7 @@ void ChunkRenderer::render(const Camera &camera)
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, framebuffer.getColorAttachment(2)->getId());
 		shader->uploadTexture(SHADER_U_REVEAL, 1);
-		// screen renderer
+		ScreenRenderer::render();
 		shader->detach();
 
 		// reset render states

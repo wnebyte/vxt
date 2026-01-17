@@ -1,6 +1,6 @@
-#include <iostream>
 #include <memory>
 #include <csignal>
+#include <iostream>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -8,10 +8,12 @@
 #include "vxt/Window.hpp"
 #include "vxt/Application.hpp"
 
+#include "vxt/utl/Misc.hpp"
 #include "vxt/utl/Assets.hpp"
 #include "vxt/utl/Constants.hpp"
 #include "vxt/utl/CmdHandler.hpp"
 
+#include "vxt/rdr/Shader.hpp"
 #include "vxt/rdr/Skybox.hpp"
 #include "vxt/rdr/Builder.hpp"
 #include "vxt/rdr/Texture.hpp"
@@ -22,14 +24,14 @@
 #include "Scene2.hpp"
 #include "Scene3.hpp"
 
-#define APPLICATION_TITLE (std::string{"untitled"})
+#define APPLICATION_TITLE "untitled"
 #define FBO_OPAQUE "fbo.opaque"
 #define FBO_ACCUM "fbo.accum"
 #define FBO_REVEAL "fbo.reveal"
 #define FBO_DEPTH "fbo.depth"
 #define FBO_USE
-
-#define FLATTEN_VEC4(v) v.x, v.y, v.z, v.w
+#define TEXTURE3 "texture3"
+#define SCREEN_SHADER_NAME "screen.glsl"
 
 using namespace vxt;
 using namespace rdr;
@@ -125,8 +127,8 @@ void MyApplication::init(Configuration &config)
 		.setInternalFormat(GL_RGBA16F)
 		.setFormat(GL_RGBA)
 		.setType(GL_HALF_FLOAT)
-		.addParameter({GL_TEXTURE_MIN_FILTER, GL_LINEAR})
-		.addParameter({GL_TEXTURE_MAG_FILTER, GL_LINEAR})
+		.addParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+		.addParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR)
 		.build<Texture::Configuration>();
 
 	accum = TextureBuilder{}
@@ -135,8 +137,8 @@ void MyApplication::init(Configuration &config)
 		.setInternalFormat(GL_RGBA16F)
 		.setFormat(GL_RGBA)
 		.setType(GL_HALF_FLOAT)
-		.addParameter({GL_TEXTURE_MIN_FILTER, GL_LINEAR})
-		.addParameter({GL_TEXTURE_MAG_FILTER, GL_LINEAR})
+		.addParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+		.addParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR)
 		.build<Texture::Configuration>();
 
 	reveal = TextureBuilder{}
@@ -145,8 +147,8 @@ void MyApplication::init(Configuration &config)
 		.setInternalFormat(GL_R8)
 		.setFormat(GL_RED)
 		.setType(GL_FLOAT)
-		.addParameter({GL_TEXTURE_MIN_FILTER, GL_LINEAR})
-		.addParameter({GL_TEXTURE_MAG_FILTER, GL_LINEAR})
+		.addParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+		.addParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR)
 		.build<Texture::Configuration>();
 
 	depth = TextureBuilder{}
@@ -180,6 +182,14 @@ void MyApplication::init(Configuration &config)
 		std::exit(EXIT_FAILURE);
 	}
 
+	// pack textures
+	Assets::getTexture(TEXTURE3, TextureBuilder{}
+		.setTarget(GL_TEXTURE_2D_ARRAY)
+		.addParameter(GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR)
+		.addParameter(GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+		.setImages(pack3(Assets::getPath("blocks", Assets::IMAGES)))
+		.build<Texture::Configuration>());
+
 	// init renderers
 	Skybox::init();
 	ScreenRenderer::init();
@@ -190,13 +200,13 @@ void MyApplication::init(Configuration &config)
 
 void MyApplication::run(void)
 {
-	float currentFrame;
 	float lastFrame = 0.0f;
+	Shader *shader = Assets::getShader(SCREEN_SHADER_NAME);
 
 	while (!m_window->shouldClose()) {
-		currentFrame = glfwGetTime();
-		m_dt = currentFrame - lastFrame;
-		lastFrame = currentFrame;
+		m_currentFrame = glfwGetTime();
+		m_dt = m_currentFrame - lastFrame;
+		lastFrame = m_currentFrame;
 
 		// poll for events
 		m_window->pollEvents(m_dt);
@@ -225,7 +235,14 @@ void MyApplication::run(void)
 			Framebuffer::unbind();
 			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-			ScreenRenderer::render(m_framebuffer.getColorAttachment(0));
+
+			shader->attach();
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, m_framebuffer.getColorAttachment(0)->getId());
+			shader->uploadTexture(SHADER_U_SCREEN, 0);
+			ScreenRenderer::render();
+			glBindTexture(GL_TEXTURE_2D, NO_ID);
+			shader->detach();
 		}
 
 		// swap buffers and end frame

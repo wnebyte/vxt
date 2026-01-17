@@ -20,6 +20,9 @@
 /// @brief No texture ID.
 #define NO_TEX_ID -1
 
+/// @brief No index.
+#define NO_INDEX -1
+
 /// @brief Undefined zIndex.
 #define UNDEFINED_ZINDEX 0x7FFFFFFF
 

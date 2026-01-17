@@ -4,6 +4,7 @@
 **/run
 **/lib
 **/testenv
+**/assets/images
 
 # FILES
 **/bin/*
@@ -11,3 +12,4 @@
 *.log
 *.so
 *.o
+*.d

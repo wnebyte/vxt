@@ -37,6 +37,11 @@ float Application::dt(void)
 	return m_app->m_dt;
 }
 
+float Application::getTime(void)
+{
+	return m_app->m_currentFrame;
+}
+
 Window* Application::getWindow(void)
 {
 	return m_app->m_window;

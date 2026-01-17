@@ -31,7 +31,7 @@ void Cubemap::init(const std::array<std::string, 6> &faces)
 	UFW_ASSERT((faces.size() == 6) && ("too many or too few faces"));
 
 	for (const_iterator iter = faces.begin(); iter != faces.end(); ++iter, ++i) {
-		const std::string path{Assets::toPath(*iter, "images")};
+		const std::string path{Assets::getPath(*iter, Assets::IMAGES)};
 		int channels;
 		int width, height;
 		uint8_t *image = NULL;
@@ -39,6 +39,7 @@ void Cubemap::init(const std::array<std::string, 6> &faces)
 		// load the image
 		stbi_set_flip_vertically_on_load(false);
 		image = stbi_load(path.c_str(), &width, &height, &channels, 0);
+
 		UFW_ASSERT((image != NULL) && ("image is NULL"));
 		UFW_ASSERT(((channels == 3) || (channels == 4)) && ("channels is not RGB or RGBA"));
 

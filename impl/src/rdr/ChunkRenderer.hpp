@@ -8,6 +8,7 @@
 #include "Types.hpp"
 #include "Camera.hpp"
 
+#include "rdr/Texture.hpp"
 #include "rdr/Shaderfwd.hpp"
 #include "rdr/DrawCommand.hpp"
 
@@ -19,9 +20,9 @@ namespace rdr
 class ChunkRenderer {
 private:
 	enum DrawCommand_t {
-		OPAQUE = 0,
+		OPAQUE      = 0,
 		TRANSPARENT = 1,
-		BLENDALBE = 2
+		BLENDALBE   = 2
 	};
 
 	typedef std::vector<DrawArraysIndirectCommand> DrawCommandVec;
@@ -76,6 +77,7 @@ private:
 	GLuint         m_vaoId;
 	GLuint         m_vboId;
 	GLuint         m_ccboId;
+	Texture       *m_texture;
 	Shader        *m_opaqueShader;
 	Shader        *m_transparentShader;
 	Shader        *m_blendableShader;

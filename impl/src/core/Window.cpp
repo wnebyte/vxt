@@ -41,7 +41,6 @@ Window::Window(const std::string &title, uint32_t width, uint32_t height)
 	: m_title(title)
 	, m_width(width)
 	, m_height(height)
-	, m_viewport()
 	, m_scene()
 {
 	init();
@@ -125,7 +124,7 @@ void Window::init(void)
 	// Make the window visible
 	glfwShowWindow(m_glfwWindow);
 
-	// Set the window size to the actual size of the window
+	// Update the window size members to the actual size of the window
 	glfwGetWindowSize(m_glfwWindow, &w, &h);
 	windowSizeCallback(m_glfwWindow, w, h);
 
@@ -229,11 +228,6 @@ uint32_t Window::getWidth(void) const
 uint32_t Window::getHeight(void) const
 {
 	return m_height;
-}
-
-Viewport Window::getViewport(void) const
-{
-	return m_viewport;
 }
 
 float Window::getAspectRatio(void) const

@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#include <glad/glad.h>
+
 #include "Types.hpp"
 #include "rdr/Texture.hpp"
 #include "rdr/Framebuffer.hpp"
@@ -55,6 +57,10 @@ public:
 
 	TextureBuilder& setParameters(const std::vector<Texture::Parameter> &params);
 	TextureBuilder& addParameter(const Texture::Parameter &param);
+	TextureBuilder& addParameter(GLenum name, GLint value);
+
+	TextureBuilder& setImages(const std::vector<Image> &images);
+	TextureBuilder& addImage(const Image &image);
 
 	template<typename T>
 	T build(void);
